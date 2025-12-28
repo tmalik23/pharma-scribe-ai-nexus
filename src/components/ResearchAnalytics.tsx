@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
-const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#EC4899', '#14B8A6'];
+const COLORS = ['#4f46e5', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#14b8a6'];
 
 const ResearchAnalytics = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -70,71 +70,79 @@ const ResearchAnalytics = () => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full bg-slate-50">
                 <div className="flex flex-col items-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
-                    <p className="text-gray-500">Loading analytics...</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-indigo-500 mb-4" />
+                    <p className="text-slate-500">Loading analytics...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="p-6 bg-gray-50 h-full overflow-auto">
+        <div className="p-6 md:p-8 bg-slate-50 h-full overflow-auto font-sans">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Research Analytics</h2>
-                    <p className="text-gray-600">Comprehensive insights into your research database</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-2">Research Analytics</h2>
+                    <p className="text-slate-500">Comprehensive insights into your research database</p>
                 </div>
 
                 {/* Key Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                    <Card className="bg-white border-slate-100 shadow-sm hover:shadow-md transition-all">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-blue-100 text-sm">Total Papers</p>
-                                    <p className="text-3xl font-bold">{stats.totalPapers?.toLocaleString()}</p>
+                                    <p className="text-slate-500 text-sm font-medium">Total Papers</p>
+                                    <p className="text-3xl font-bold text-slate-800">{stats.totalPapers?.toLocaleString()}</p>
                                 </div>
-                                <BarChart3 size={40} className="opacity-80" />
+                                <div className="p-3 bg-indigo-50 rounded-xl">
+                                    <BarChart3 size={24} className="text-indigo-600" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                    <Card className="bg-white border-slate-100 shadow-sm hover:shadow-md transition-all">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-purple-100 text-sm">Year Range</p>
-                                    <p className="text-2xl font-bold">{stats.yearRange}</p>
+                                    <p className="text-slate-500 text-sm font-medium">Year Range</p>
+                                    <p className="text-2xl font-bold text-slate-800">{stats.yearRange}</p>
                                 </div>
-                                <Calendar size={40} className="opacity-80" />
+                                <div className="p-3 bg-purple-50 rounded-xl">
+                                    <Calendar size={24} className="text-purple-600" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+                    <Card className="bg-white border-slate-100 shadow-sm hover:shadow-md transition-all">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-green-100 text-sm">Unique Tags</p>
-                                    <p className="text-3xl font-bold">{topEntities.length}</p>
+                                    <p className="text-slate-500 text-sm font-medium">Unique Tags</p>
+                                    <p className="text-3xl font-bold text-slate-800">{topEntities.length}</p>
                                 </div>
-                                <Tag size={40} className="opacity-80" />
+                                <div className="p-3 bg-teal-50 rounded-xl">
+                                    <Tag size={24} className="text-teal-600" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                    <Card className="bg-white border-slate-100 shadow-sm hover:shadow-md transition-all">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-orange-100 text-sm">Avg per Year</p>
-                                    <p className="text-3xl font-bold">
+                                    <p className="text-slate-500 text-sm font-medium">Avg per Year</p>
+                                    <p className="text-3xl font-bold text-slate-800">
                                         {yearlyData.length > 0 ? Math.round(stats.totalPapers / yearlyData.length) : 0}
                                     </p>
                                 </div>
-                                <TrendingUp size={40} className="opacity-80" />
+                                <div className="p-3 bg-orange-50 rounded-xl">
+                                    <TrendingUp size={24} className="text-orange-600" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -143,36 +151,67 @@ const ResearchAnalytics = () => {
                 {/* Charts Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     {/* Publications Timeline */}
-                    <Card>
+                    <Card className="border-slate-100 shadow-sm">
                         <CardHeader>
-                            <CardTitle>Publications Over Time</CardTitle>
+                            <CardTitle className="text-slate-800">Publications Over Time</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={yearlyData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="year" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Line type="monotone" dataKey="count" stroke="#3B82F6" strokeWidth={2} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                    <XAxis
+                                        dataKey="year"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="count"
+                                        stroke="#4f46e5"
+                                        strokeWidth={3}
+                                        dot={false}
+                                        activeDot={{ r: 6, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }}
+                                    />
                                 </LineChart>
                             </ResponsiveContainer>
                         </CardContent>
                     </Card>
 
                     {/* Publications by Decade */}
-                    <Card>
+                    <Card className="border-slate-100 shadow-sm">
                         <CardHeader>
-                            <CardTitle>Publications by Decade</CardTitle>
+                            <CardTitle className="text-slate-800">Publications by Decade</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={decadeData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="decade" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="paper_count" fill="#8B5CF6" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                    <XAxis
+                                        dataKey="decade"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                    />
+                                    <Tooltip
+                                        cursor={{ fill: '#f1f5f9' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Bar dataKey="paper_count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -180,18 +219,28 @@ const ResearchAnalytics = () => {
                 </div>
 
                 {/* Top Research Topics */}
-                <Card>
+                <Card className="border-slate-100 shadow-sm">
                     <CardHeader>
-                        <CardTitle>Top 20 Research Topics</CardTitle>
+                        <CardTitle className="text-slate-800">Top 20 Research Topics</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={500}>
                             <BarChart data={topEntities} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis type="number" />
-                                <YAxis dataKey="entity" type="category" width={200} />
-                                <Tooltip />
-                                <Bar dataKey="paper_count" fill="#10B981" />
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                                <XAxis type="number" hide />
+                                <YAxis
+                                    dataKey="entity"
+                                    type="category"
+                                    width={200}
+                                    tick={{ fill: '#475569', fontSize: 13 }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: '#f1f5f9' }}
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Bar dataKey="paper_count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
