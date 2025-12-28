@@ -1,58 +1,74 @@
-
-import React, { useState } from 'react';
-import { Database, FileText, Tag, Calendar, TrendingUp, Users, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Database, FileText, Tag, Calendar, TrendingUp, Users, Search, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase';
 
 const DatabaseBrowser = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalPapers: 0,
+    totalAuthors: 0, // We might not have an authors table, so this is tricky to get exactly without heavy query
+    totalTags: 0,    // Same for tags if they are in jsonb
+    newThisMonth: 0
+  });
+  const [recentPapers, setRecentPapers] = useState<any[]>([]);
 
-  // Demo statistics
-  const stats = {
-    totalPapers: 1247,
-    totalAuthors: 3421,
-    totalTags: 156,
-    newThisMonth: 89
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+
+      // 1. Get Total Papers
+      const { count: totalPapers, error: countError } = await supabase
+        .from('papers')
+        .select('*', { count: 'exact', head: true });
+
+      if (countError) throw countError;
+
+      // 2. Get Recent Papers
+      const { data: papers, error: papersError } = await supabase
+        .from('papers')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (papersError) throw papersError;
+
+      setRecentPapers(papers || []);
+
+      // 3. Estimate other stats (since we don't have separate tables for authors/tags yet)
+      // For now, we'll just show the paper count which is the most important one.
+      setStats({
+        totalPapers: totalPapers || 0,
+        totalAuthors: 0, // Placeholder until we analyze authors
+        totalTags: 0,    // Placeholder
+        newThisMonth: 0  // Placeholder
+      });
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Demo recent papers
-  const recentPapers = [
-    {
-      id: '1',
-      title: 'Breakthrough in Alzheimer\'s Treatment: Novel Therapeutic Approach',
-      date: '2024-01-20',
-      tags: ['Neurology', 'Alzheimer\'s', 'Clinical Trial'],
-      authors: 3,
-      citations: 12
-    },
-    {
-      id: '2',
-      title: 'CRISPR-Cas9 Applications in Genetic Disease Treatment',
-      date: '2024-01-18',
-      tags: ['Gene Therapy', 'CRISPR', 'Genetic Disorders'],
-      authors: 5,
-      citations: 28
-    },
-    {
-      id: '3',
-      title: 'Immunotherapy Advances in Cancer Treatment',
-      date: '2024-01-15',
-      tags: ['Oncology', 'Immunotherapy', 'Cancer Research'],
-      authors: 4,
-      citations: 45
-    }
-  ];
-
-  // Demo trending topics
-  const trendingTopics = [
-    { tag: 'mRNA Vaccines', count: 234, trend: '+15%' },
-    { tag: 'AI Drug Discovery', count: 189, trend: '+28%' },
-    { tag: 'Personalized Medicine', count: 156, trend: '+12%' },
-    { tag: 'CRISPR Gene Editing', count: 142, trend: '+22%' },
-    { tag: 'Immunotherapy', count: 128, trend: '+8%' }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-50">
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
+          <p className="text-gray-500">Loading database statistics...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 h-full overflow-auto">
@@ -76,38 +92,15 @@ const DatabaseBrowser = () => {
             </CardContent>
           </Card>
 
+          {/* Other cards kept static for now as we don't have the data easily accessible without expensive queries */}
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Authors</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalAuthors.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-gray-600">Database Status</p>
+                  <p className="text-xl font-bold text-green-600">Active</p>
                 </div>
-                <Users className="text-green-500" size={24} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">AI Tags</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalTags}</p>
-                </div>
-                <Tag className="text-purple-500" size={24} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">New This Month</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.newThisMonth}</p>
-                </div>
-                <TrendingUp className="text-orange-500" size={24} />
+                <Database className="text-green-500" size={24} />
               </div>
             </CardContent>
           </Card>
@@ -115,7 +108,7 @@ const DatabaseBrowser = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Papers */}
-          <Card>
+          <Card className="col-span-2 lg:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <FileText size={20} />
@@ -126,85 +119,24 @@ const DatabaseBrowser = () => {
               <div className="space-y-4">
                 {recentPapers.map(paper => (
                   <div key={paper.id} className="border-b pb-4 last:border-b-0">
-                    <h4 className="font-medium text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
+                    <h4 className="font-medium text-gray-900 mb-2 hover:text-blue-600 cursor-pointer truncate">
                       {paper.title}
                     </h4>
                     <div className="flex items-center text-sm text-gray-500 mb-2">
-                      <Calendar size={14} className="mr-1" />
-                      <span>{new Date(paper.date).toLocaleDateString()}</span>
-                      <span className="mx-2">•</span>
-                      <Users size={14} className="mr-1" />
-                      <span>{paper.authors} authors</span>
-                      <span className="mx-2">•</span>
-                      <span>{paper.citations} citations</span>
+                      {/* Display available metadata if exists */}
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">ID: {paper.id.slice(0, 8)}...</span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {paper.tags.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Trending Topics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp size={20} />
-                <span>Trending Research Topics</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {trendingTopics.map((topic, index) => (
-                  <div key={topic.tag} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{topic.tag}</p>
-                        <p className="text-sm text-gray-500">{topic.count} papers</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-green-600 border-green-200">
-                      {topic.trend}
-                    </Badge>
+                    {/* Display summary snippet if available */}
+                    {paper.summary && (
+                      <p className="text-sm text-gray-600 line-clamp-2">{paper.summary}</p>
+                    )}
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Quick Search */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Quick Database Search</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex space-x-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search papers, authors, or topics..."
-                  className="pl-10"
-                />
-              </div>
-              <Button>Search Database</Button>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Search across {stats.totalPapers.toLocaleString()} research papers using AI-powered semantic search
-            </p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

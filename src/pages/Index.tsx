@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import ChatInterface from '@/components/ChatInterface';
 import PaperSearch from '@/components/PaperSearch';
-import PaperUpload from '@/components/PaperUpload';
 import DatabaseBrowser from '@/components/DatabaseBrowser';
 
 const Index = () => {
@@ -15,8 +14,6 @@ const Index = () => {
         return <ChatInterface />;
       case 'search':
         return <PaperSearch />;
-      case 'upload':
-        return <PaperUpload />;
       case 'database':
         return <DatabaseBrowser />;
       case 'analytics':
@@ -52,7 +49,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="h-screen flex bg-gray-100">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 flex flex-col">
         {renderContent()}

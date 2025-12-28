@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Upload, Database, MessageSquare, Settings, FileText, Tag, BarChart3 } from 'lucide-react';
+import { Search, Database, MessageSquare, Settings, FileText, Tag, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -12,7 +12,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const menuItems = [
     { id: 'chat', icon: MessageSquare, label: 'AI Research Chat' },
     { id: 'search', icon: Search, label: 'Paper Search' },
-    { id: 'upload', icon: Upload, label: 'Upload Papers' },
     { id: 'database', icon: Database, label: 'Browse Database' },
     { id: 'analytics', icon: BarChart3, label: 'Research Analytics' },
     { id: 'tags', icon: Tag, label: 'AI Tags' },
@@ -24,7 +23,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
         <h1 className="text-xl font-bold">PharmaResearch AI</h1>
         <p className="text-sm text-gray-400 mt-1">Research Database</p>
       </div>
-      
+
       <nav className="flex-1 px-4">
         {menuItems.map((item) => (
           <button
@@ -42,7 +41,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
           </button>
         ))}
       </nav>
-      
+
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={() => onTabChange('settings')}
